@@ -1,0 +1,130 @@
+# ============================================================
+# CONFIG FILES - ALLOWED (not ignored)
+# ============================================================
+# Config files are tracked by default:
+#   *.properties, *.yaml, *.yml, *.json, *.toml, *.conf, *.sh
+# Exception: Sensitive configs below are ignored
+
+# Secrets
+.env
+**/.env
+!.env.example
+!**/.env.example
+application.properties
+**/secrets.properties
+**/credentials.properties
+
+# JMX credentials (DANGEROUS - contains passwords)
+jmxremote.password
+**/jmxremote.password
+jmxremote.access
+**/jmxremote.access
+
+# SSL
+*.key
+*.pem
+*.crt
+
+# PostgreSQL binary/data trong fast_api/database_sql/
+fast_api/database_sql/base/
+fast_api/database_sql/global/
+fast_api/database_sql/pg_commit_ts/
+fast_api/database_sql/pg_dynshmem/
+fast_api/database_sql/pg_logical/
+fast_api/database_sql/pg_multixact/
+fast_api/database_sql/pg_notify/
+fast_api/database_sql/pg_replslot/
+fast_api/database_sql/pg_serial/
+fast_api/database_sql/pg_snapshots/
+fast_api/database_sql/pg_stat/
+fast_api/database_sql/pg_stat_tmp/
+fast_api/database_sql/pg_subtrans/
+fast_api/database_sql/pg_tblspc/
+fast_api/database_sql/pg_twophase/
+fast_api/database_sql/pg_wal/
+fast_api/database_sql/pg_xact/
+fast_api/database_sql/PG_VERSION
+fast_api/database_sql/postgresql.auto.conf
+fast_api/database_sql/postmaster.opts
+fast_api/database_sql/postmaster.pid
+fast_api/database_sql/pg_ident.conf
+fast_api/database_sql/*.lock
+
+# Logs - ALL IGNORED
+*.log
+*.log.*
+logs/
+log/
+logfile
+**/logs/
+**/log/
+Migration_DB_Foundation/debezium/logs/
+
+# Markdown files - IGNORE ALL except root README.md
+*.md
+!/README.md
+!CHANGELOG.md
+!LICENSE.md
+
+# CDC data - Debezium
+Migration_DB_Foundation/debezium/data/
+Migration_DB_Foundation/debezium/offsets.dat
+offsets.dat
+
+# Kafka data - CONTAINS CUSTOMER DATA (PII)
+kafka-data/logs/
+kafka-data/**/logs/
+kafka-data/**/*.log
+kafka-data/**/*.index
+kafka-data/**/*.timeindex
+kafka-data/**/*.snapshot
+kafka-data/**/*.cleaned
+kafka-data/**/cleaner-offset-checkpoint
+kafka-data/**/log-start-offset-checkpoint
+kafka-data/**/recovery-point-offset-checkpoint
+kafka-data/**/replication-offset-checkpoint
+
+# Iceberg/Derby - CONTAINS MIGRATED DATA
+iceberg/warehouse/
+iceberg/metastore_db/
+iceberg/derby.log
+iceberg/**/*.parquet
+iceberg/**/*.avro
+iceberg/**/*.orc
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+
+# Java / Scala
+*.class
+*.jar
+*.tar.gz
+*.zip
+*.war
+target/
+.gradle/
+build/
+
+# Nix
+result
+result-*
+.direnv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+.claude/
+
+# OS
+.DS_Store
+
+# Supabase CLI temp files
+supabase/.temp/
+supabase/.branches/
+**/supabase/.temp/
+**/supabase/.branches/
