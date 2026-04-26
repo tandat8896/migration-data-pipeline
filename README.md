@@ -2,8 +2,9 @@
 
 **Lab học zero-downtime migration** sử dụng CDC (Change Data Capture) để migrate data giữa các databases mà không downtime.
 
-**Status:** Phase 2 - 95% Complete (Postgres pipeline working!)
-**Last updated:** 2026-04-26
+**Status:** Phase 2 - 97% Complete (Postgres + Schema Registry done!)
+**Last updated:** 2026-04-26 Session 3
+**Next session:** TBD (3 months later)
 
 ---
 
@@ -100,6 +101,35 @@ Postgres → Debezium → Kafka → Spark → Iceberg → Supabase ✅
 #### 2C. Monitoring ⏳ TODO
 5. ⏳ Implement Lag Monitor job
 6. ⏳ Track migration_status table
+
+#### 2D. Schema Registry (Schema Governance) ✅ DONE (2026-04-26 Session 3)
+1. ✅ Setup Confluent Schema Registry 7.5.0 (Nix derivation)
+2. ✅ Fix 7 bugs (read-only store, classpath, folder structure, log4j, kafka conflict)
+3. ✅ Configure schema-registry.properties
+4. ✅ Create log4j.properties
+5. ✅ Test schema registration & compatibility
+6. ✅ Document bugs & fixes (BUGS_FIXED.md)
+7. ✅ Create test guide (TEST_GUIDE.md)
+
+**Result:**
+```
+Schema Registry: http://localhost:8081 ✅
+Compatible with Kafka (no SLF4J conflicts) ✅
+Ready for Avro serialization ✅
+```
+
+**Docs:** `kafka-data/schema_registry_confluent/`
+- README.md - Setup guide
+- BUGS_FIXED.md - 7 bugs debugged (2 hours)
+- TEST_GUIDE.md - 15 test cases
+- schema-registry.properties - Config (fixed)
+- log4j.properties - Logging config
+
+**Key Learnings:**
+- Nix store is immutable → override LOG_DIR
+- Use `cp -r` to preserve folder structure (not `install -D`)
+- Don't export CLASSPATH globally (causes Kafka conflicts)
+- log4j doesn't expand shell environment variables
 
 **Output (current):**
 - Iceberg Bronze: 430 CDC records (audit trail)
@@ -252,10 +282,6 @@ tandat_project/
 │   ├── target_schema_simple.sql
 │   └── SETUP_GUIDE.md
 │
-├── .claude/rules/             # Project instructions
-│   ├── current-state.md       # Detailed progress tracking
-│   ├── diagram1-4phases.md    # Phase diagrams
-│   └── diagram2-components.md # Component details
 │
 ├── phase1.md                  # Architecture documentation
 ├── .gitignore                 # Ignore logs, data, credentials
@@ -307,7 +333,6 @@ GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO debezium_cdc;
 export PACKAGES="...,org.postgresql:postgresql:42.7.3"
 ```
 
-**Full troubleshooting guide:** `.claude/rules/current-state.md` (section "TROUBLESHOOTING GUIDE")
 
 ---
 
@@ -376,9 +401,6 @@ Overall Progress: ████████████████░░░░ 9
 ## 📚 Documentation
 
 - **Architecture:** `phase1.md` - Detailed architecture diagrams
-- **Current State:** `.claude/rules/current-state.md` - Progress tracking
-- **Phases:** `.claude/rules/diagram1-4phases.md` - Migration phases
-- **Components:** `.claude/rules/diagram2-components.md` - Component details
 - **Supabase Setup:** `supabase/SETUP_GUIDE.md` - Target DB setup
 
 ---
@@ -396,7 +418,6 @@ Overall Progress: ████████████████░░░░ 9
 ## 📞 Owner Notes
 
 **Infra:** Owner tự setup (Postgres, MongoDB, Kafka, Supabase)
-**Claude Code:** Implement CDC pipeline theo 2 diagrams
 **Current:** Postgres pipeline working, MongoDB pending
 **Next:** Generate MongoDB data → Complete Phase 2
 
