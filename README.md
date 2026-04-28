@@ -1,117 +1,258 @@
 # Zero-Downtime Migration (ZDM) Lab
 
-**Lab học zero-downtime migration** sử dụng CDC (Change Data Capture) để migrate data giữa các databases mà không downtime.
+**Lab học zero-downtime migration** với **Schema Governance** sử dụng CDC (Change Data Capture) + Avro + Confluent Schema Registry.
 
-**Status:** Phase 2 - 97% Complete (Postgres + Schema Registry done!)
-**Last updated:** 2026-04-26 Session 3
-**Next session:** TBD (3 months later)
+**Status:** Phase 1 Complete ✅ | Phase 2 In Progress (15%)
+**Last updated:** 2026-04-28 Session 5
+**Next session:** Spark Avro Consumers
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ Architecture - Production Grade with Schema Governance
 
 ```
-┌─────────────────┐         ┌─────────────────┐
-│  Postgres Local │         │  MongoDB Atlas  │
-│  (127.0.0.1)    │         │  (Cloud)        │
-│  ✅ 430 cust    │         │  ⏳ 0 docs      │
-└────────┬────────┘         └────────┬────────┘
-         │                           │
-         └─────────┬─────────────────┘
-                   ▼
-         ┌──────────────────┐
-         │  DEBEZIUM CDC    │
-         │  Engine          │
-         │  ✅ PG connector │
-         │  ⏳ Mongo conn   │
-         └─────────┬────────┘
-                   ▼
-         ┌──────────────────┐
-         │  KAFKA BROKER    │
-         │  5 topics        │
-         │  ✅ 3 active     │
-         └─────────┬────────┘
-                   ▼
-         ┌──────────────────┐
-         │  SPARK 3.5.1     │
-         │  Streaming Jobs  │
-         │  ✅ Job 1 done   │
-         └─────────┬────────┘
-                   ▼
-    ┌──────────────┴───────────────┐
-    ▼                              ▼
-┌─────────────┐          ┌──────────────────┐
-│ Iceberg     │          │ Supabase         │
-│ Bronze      │          │ Postgres (Cloud) │
-│ (Audit)     │          │ (Target DB)      │
-│ ✅ 430 rec  │          │ ✅ 430 customers │
-└─────────────┘          └──────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                  CDC SOURCES (2)                      │
+└──────────────────────────────────────────────────────┘
+
+┌─────────────────┐              ┌──────────────────┐
+│ Postgres Local  │              │ MongoDB Atlas    │
+│ 127.0.0.1:5432  │              │ Cloud (M10+)     │
+│                 │              │                  │
+│ • customers     │              │ • customer_evt   │
+│ • orders        │              │ • inventory_*    │
+│ • order_items   │              │                  │
+│                 │              │ Oplog enabled    │
+│ Plugin:pgoutput │              │ Replica set ✅   │
+└────────┬────────┘              └────────┬─────────┘
+         │                                │
+         └────────────┬───────────────────┘
+                      ▼
+         ┌────────────────────────────┐
+         │   DEBEZIUM SERVER 2.5.4    │
+         │   (Standalone CDC Engine)  │
+         │                            │
+         │ ✅ pg-local-migration      │
+         │ ✅ mongo-migration         │
+         │                            │
+         │ Format: Avro (binary)      │
+         │ Serializer: Confluent 7.5  │
+         └────────────┬───────────────┘
+                      ▼
+         ┌────────────────────────────┐
+         │ CONFLUENT SCHEMA REGISTRY  │
+         │      http://localhost:8081 │
+         │                            │
+         │ ✅ 6 Postgres schemas      │
+         │ ✅ 4 MongoDB schemas       │
+         │                            │
+         │ Mode: BACKWARD compat      │
+         │ Versioning: Enabled        │
+         └────────────┬───────────────┘
+                      ▼
+         ┌────────────────────────────┐
+         │    KAFKA BROKERS (2)       │
+         │ localhost:9092, :9094      │
+         │                            │
+         │ Topics (Postgres):         │
+         │ • pg_local_avro_v2         │
+         │   .public.customers ✅     │
+         │   .public.orders ✅        │
+         │   .public.order_items ✅   │
+         │                            │
+         │ Topics (MongoDB):          │
+         │ • mongo_atlas_v2           │
+         │   .zdm_test                │
+         │   .customer_events ✅      │
+         │   .inventory_* ✅          │
+         │                            │
+         │ Format: Avro + schema ID   │
+         └────────────┬───────────────┘
+                      ▼
+         ┌────────────────────────────┐
+         │   SPARK 3.5.1 + Iceberg    │
+         │   Streaming Jobs (TODO)    │
+         │                            │
+         │ ⏳ Job 1: PG Avro Consumer │
+         │ ⏳ Job 2: Mongo Consumer   │
+         │ ⏳ Job 3: Lag Monitor      │
+         └────────────┬───────────────┘
+                      ▼
+    ┌─────────────────┴──────────────┐
+    ▼                                ▼
+┌──────────────┐          ┌────────────────┐
+│ Iceberg      │          │ Supabase PG    │
+│ Bronze       │          │ (Target)       │
+│ (Audit Trail)│          │                │
+│              │          │ ⏳ Pending     │
+│ ⏳ Pending   │          │ migration      │
+└──────────────┘          └────────────────┘
 ```
 
-**Data Flow:** Source DB → Debezium → Kafka → Spark → (Iceberg + Target DB)
+**Data Flow with Schema Governance:**
+```
+Source DB → Debezium (Avro serialize)
+         → Schema Registry (validate + register)
+         → Kafka (binary + schema ID)
+         → Spark (Avro deserialize)
+         → (Iceberg + Target DB)
+```
+
+---
+
+## 🎯 Key Achievement: Schema Governance!
+
+**✅ Successfully integrated Confluent Schema Registry with Debezium Server**
+
+Despite lack of official documentation, achieved:
+- ✅ **Avro serialization** (40% smaller than JSON)
+- ✅ **Schema versioning** (track evolution over time)
+- ✅ **Type validation** at producer (no bad data in Kafka)
+- ✅ **Backward compatibility** enforcement
+- ✅ **Breaking change detection** (HTTP 409 on incompatible schemas)
+
+**Bugs fixed:** 3 major issues documented in `.claude/rules/fixbugconfluent.md`
+
+**Schemas registered:** 10 total (6 Postgres + 4 MongoDB)
 
 ---
 
 ## 📋 4 Phases Migration
 
-### Phase 1: Snapshot & CDC Setup ✅ DONE
+### Phase 1: CDC Infrastructure Setup ✅ COMPLETE
 
-**Mục tiêu:** Thiết lập CDC từ source databases
+**Completed:**
+- ✅ Postgres Local CDC (pgoutput plugin)
+- ✅ MongoDB Atlas CDC (replica set)
+- ✅ Debezium Server 2.5.4 configured
+- ✅ Confluent Schema Registry 7.5.0 running
+- ✅ Avro serialization working
+- ✅ Kafka brokers operational (2 brokers)
+- ✅ All schemas registered (10 schemas)
+- ✅ Kafka topics created (5 topics)
+
+**Time:** ~6 hours (including troubleshooting)
+
+### Phase 2: Spark Consumers ⏳ IN PROGRESS (15%)
+
+**Mục tiêu:** Implement Spark jobs to consume Avro from Kafka and write to targets
 
 **Công việc:**
-1. ✅ Setup Postgres Local với logical replication
-2. ✅ Setup MongoDB Atlas với Change Streams
-3. ✅ Configure Debezium connectors (2 connectors)
-4. ✅ Setup Kafka brokers (2 brokers, 5 topics)
-5. ✅ Generate test data (430 customers, 1288 orders)
-6. ✅ Verify CDC events flowing to Kafka
+1. ⏳ Add Confluent Avro dependencies to Spark
+2. ⏳ Implement Postgres Avro consumer (read from Kafka + Schema Registry)
+3. ⏳ Implement MongoDB Avro consumer
+4. ⏳ Write to Iceberg Bronze (audit trail)
+5. ⏳ Upsert to Supabase (target database)
+6. ⏳ Implement lag monitor job
 
-**Output:**
-- Postgres CDC → Kafka: 4,294 messages ✅
-- MongoDB CDC → Kafka: 0 messages (pending data)
+**Next:** Create Spark script to read Avro messages using Confluent deserializer
 
 ---
 
-### Phase 2: Dual-Write (Spark Consumers) 🚧 90% DONE
+### Phase 3: Validation ⏳ TODO
 
-**Mục tiêu:** Spark apply CDC events vào target song song với source
+**Mục tiêu:** Validate source vs target data
 
-**Công việc:**
+1. ⏳ Record count comparison
+2. ⏳ Checksum validation
+3. ⏳ Sample row comparison
 
-#### 2A. Postgres Pipeline ✅ DONE
-1. ✅ Setup Spark 3.5.1 + Iceberg 1.5.0
-2. ✅ Implement Kafka → Iceberg Bronze consumer
-3. ✅ Implement Iceberg → Supabase upsert
-4. ✅ Create target schema in Supabase (6 tables)
-5. ✅ Grant permissions (debezium_cdc user)
-6. ✅ Migrate 430 customers successfully
+---
 
-**Result:**
+### Phase 4: Cutover ⏳ TODO
+
+**Mục tiêu:** Feature flag + cutover simulation
+
+1. ⏳ Feature flag service
+2. ⏳ Cutover procedure
+3. ⏳ Rollback plan
+
+---
+
+## 📊 Current Status Summary (2026-04-28)
+
+### ✅ Working Components
+
+| Component | Version | Status | Details |
+|-----------|---------|--------|---------|
+| Postgres Local | - | ✅ Streaming | pgoutput plugin, 3 tables |
+| MongoDB Atlas | M10+ | ✅ Streaming | Replica set, 2 collections |
+| Debezium Server | 2.5.4 | ✅ Running | 2 connectors active |
+| Schema Registry | 7.5.0 | ✅ Running | 10 schemas registered |
+| Kafka Brokers | 3.6.1 | ✅ Running | 2 brokers, 5 topics |
+| Avro Serialization | - | ✅ Working | Binary format + schema ID |
+
+### ⏳ Pending Components
+
+| Component | Status | Blocker |
+|-----------|--------|---------|
+| Spark Consumers | Not started | Need Avro dependencies |
+| Iceberg Bronze | Not started | Need Spark consumer |
+| Supabase Target | Not started | Need Spark consumer |
+| Lag Monitor | Not started | Need Spark consumer |
+
+### 📈 Progress Metrics
+
+- **Phase 1 (CDC Setup):** 100% ✅
+- **Phase 2 (Consumers):** 15% ⏳
+- **Phase 3 (Validation):** 0% ⏳
+- **Phase 4 (Cutover):** 0% ⏳
+- **Overall:** 30% complete
+
+**Time invested:** ~8 hours (mostly troubleshooting Schema Registry integration)
+
+**Key milestone:** Successfully integrated Confluent Schema Registry with Debezium Server despite lack of official documentation!
+
+---
+
+## 🔑 Quick Start
+
+### Start Infrastructure
+
+```bash
+# 1. Start Kafka brokers
+cd kafka-data
+kafka-server-start config/server-1.properties &
+kafka-server-start config/server-2.properties &
+
+# 2. Start Schema Registry
+schema-registry-start schema_registry_confluent/schema-registry.properties &
+
+# 3. Verify
+curl http://localhost:8081/subjects  # Should return 10 schemas
 ```
-Postgres → Debezium → Kafka → Spark → Iceberg → Supabase ✅
-430/430 customers migrated (2026-04-26 10:28:50)
+
+### Start CDC Connectors
+
+```bash
+cd Migration_DB_Foundation
+
+# Option 1: Postgres CDC
+nix develop --command bash -c "
+  source .env && cd debezium && \
+  cp conf/pg-local-migration-avro-v2.properties conf/application.properties && \
+  ./run.sh
+"
+
+# Option 2: MongoDB CDC
+nix develop --command bash -c "
+  source .env && cd debezium && \
+  cp conf/mongo-migration-avro-v2.properties conf/application.properties && \
+  ./run.sh
+"
 ```
 
-#### 2B. MongoDB Pipeline ⏳ TODO
-1. ⏳ Generate MongoDB test data
-2. ⏳ Start MongoDB Debezium connector
-3. ⏳ Implement MongoDB CDC consumer
-4. ⏳ Migrate customer_events + inventory_snapshots
+### Check Status
 
-#### 2C. Monitoring ⏳ TODO
-5. ⏳ Implement Lag Monitor job
-6. ⏳ Track migration_status table
+```bash
+# Schemas registered
+curl -s http://localhost:8081/subjects | python -m json.tool
 
-#### 2D. Schema Registry (Schema Governance) ✅ DONE (2026-04-26 Session 3)
-1. ✅ Setup Confluent Schema Registry 7.5.0 (Nix derivation)
-2. ✅ Fix 7 bugs (read-only store, classpath, folder structure, log4j, kafka conflict)
-3. ✅ Configure schema-registry.properties
-4. ✅ Create log4j.properties
-5. ✅ Test schema registration & compatibility
-6. ✅ Document bugs & fixes (BUGS_FIXED.md)
-7. ✅ Create test guide (TEST_GUIDE.md)
+# Kafka topics
+cd kafka-data && kafka-topics --bootstrap-server localhost:9092 --list
 
-**Result:**
+# Debezium logs
+tail -f Migration_DB_Foundation/debezium/logs/debezium.log
 ```
 Schema Registry: http://localhost:8081 ✅
 Compatible with Kafka (no SLF4J conflicts) ✅
@@ -132,9 +273,11 @@ Ready for Avro serialization ✅
 - log4j doesn't expand shell environment variables
 
 **Output (current):**
-- Iceberg Bronze: 430 CDC records (audit trail)
-- Supabase Target: 430 customers migrated
+- Kafka: 5,413 total messages (Postgres: 4,294 + MongoDB: 1,119)
+- Iceberg Bronze: 430 CDC records (Postgres only - audit trail)
+- Supabase Target: 430 customers migrated (Postgres pipeline complete)
 - Migration latency: ~2 seconds end-to-end
+- **Next:** MongoDB → Supabase pipeline (Spark Lesson 6)
 
 ---
 

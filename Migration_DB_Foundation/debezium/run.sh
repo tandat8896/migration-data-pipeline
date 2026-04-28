@@ -53,8 +53,10 @@ CONFIG_FILE=${1:-conf/application.properties}
 echo "Using config: $CONFIG_FILE"
 
 # Fix 2: Ép Classpath và Main Class chuẩn theo tài liệu trích xuất
+# Fix 3: Include all connectors from lib/ (MongoDB, Postgres, etc.)
 exec "$JAVA_BINARY" $DEBEZIUM_OPTS $JAVA_OPTS \
     -Dconfig.file="$CONFIG_FILE" \
     -Ddebezium.source.database.password="$DB_PASSWORD" \
-    -cp "$RUNNER$PATH_SEP""conf""$PATH_SEP"".""$PATH_SEP""lib/*""$PATH_SEP""connectors/debezium-connector-postgres/*" \
+    -Ddebezium.source.mongodb.connection.string="$MONGO_URL" \
+    -cp "$RUNNER$PATH_SEP""conf""$PATH_SEP"".""$PATH_SEP""lib/*""$PATH_SEP""connectors/*" \
     io.debezium.server.Main

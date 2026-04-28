@@ -9,12 +9,18 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+
+      pythonEnv = pkgs.python312.withPackages (ps: [
+        ps.pymongo
+        ps.faker
+      ]);
     in {
       devShells.${system}.default = pkgs.mkShell {
         packages = [
           pkgs.mongosh
           pkgs.mongodb-atlas-cli
           pkgs.mongodb-tools
+          pythonEnv
         ];
 
         shellHook = ''

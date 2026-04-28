@@ -1,0 +1,245 @@
+Manifest-Version: 1.0
+Class-Path:  lib/io.apicurio.apicurio-registry-common-2.6.11.Final.jar l
+ ib/jakarta.ws.rs.jakarta.ws.rs-api-3.1.0.jar lib/com.fasterxml.jackson.
+ core.jackson-annotations-2.17.2.jar lib/io.apicurio.apicurio-registry-u
+ tils-kafka-2.6.11.Final.jar lib/org.eclipse.microprofile.config.micropr
+ ofile-config-api-3.1.jar lib/org.apache.kafka.kafka-clients-3.9.0.jar l
+ ib/com.github.luben.zstd-jni-1.5.6-4.jar lib/org.lz4.lz4-java-1.8.0.jar
+  lib/org.xerial.snappy.snappy-java-1.1.10.5.jar lib/org.slf4j.slf4j-api
+ -2.0.6.jar lib/org.jboss.slf4j.slf4j-jboss-logging-1.2.1.Final.jar lib/
+ org.jboss.logging.jboss-logging-3.6.0.Final.jar lib/io.apicurio.apicuri
+ o-registry-schema-util-provider-2.6.11.Final.jar lib/io.apicurio.apicur
+ io-registry-schema-util-common-2.6.11.Final.jar lib/com.fasterxml.jacks
+ on.datatype.jackson-datatype-json-org-2.17.2.jar lib/org.json.json-2024
+ 0303.jar lib/io.apicurio.apicurio-registry-schema-util-json-2.6.11.Fina
+ l.jar lib/com.github.everit-org.json-schema.org.everit.json.schema-1.14
+ .4.jar lib/commons-validator.commons-validator-1.7.jar lib/commons-dige
+ ster.commons-digester-2.1.jar lib/com.damnhandy.handy-uri-templates-2.1
+ .8.jar lib/joda-time.joda-time-2.10.2.jar lib/com.google.re2j.re2j-1.7.
+ jar lib/io.vertx.vertx-json-schema-4.5.11.jar lib/io.apicurio.apicurio-
+ registry-schema-util-protobuf-2.6.11.Final.jar lib/io.apicurio.apicurio
+ -registry-schema-util-asyncapi-2.6.11.Final.jar lib/io.apicurio.apicuri
+ o-registry-schema-util-avro-2.6.11.Final.jar lib/org.apache.avro.avro-1
+ .12.0.jar lib/org.apache.commons.commons-compress-1.27.0.jar lib/common
+ s-io.commons-io-2.16.1.jar lib/io.apicurio.apicurio-registry-schema-uti
+ l-graphql-2.6.11.Final.jar lib/com.graphql-java.graphql-java-22.3.jar l
+ ib/com.graphql-java.java-dataloader-3.3.0.jar lib/org.reactivestreams.r
+ eactive-streams-1.0.4.jar lib/io.apicurio.apicurio-registry-schema-util
+ -kconnect-2.6.11.Final.jar lib/org.apache.kafka.connect-json-3.9.0.jar 
+ lib/org.apache.kafka.connect-api-3.9.0.jar lib/com.fasterxml.jackson.mo
+ dule.jackson-module-afterburner-2.17.2.jar lib/io.apicurio.apicurio-reg
+ istry-schema-util-openapi-2.6.11.Final.jar lib/io.apicurio.apicurio-dat
+ a-models-2.0.4.jar lib/io.apicurio.apicurio-registry-schema-util-wsdl-2
+ .6.11.Final.jar lib/wsdl4j.wsdl4j-1.6.3.jar lib/io.apicurio.apicurio-re
+ gistry-schema-util-xml-2.6.11.Final.jar lib/org.apache.santuario.xmlsec
+ -4.0.3.jar lib/com.fasterxml.woodstox.woodstox-core-7.0.0.jar lib/org.c
+ odehaus.woodstox.stax2-api-4.2.2.jar lib/io.apicurio.apicurio-registry-
+ schema-util-xsd-2.6.11.Final.jar lib/io.apicurio.apicurio-common-app-co
+ mponents-core-0.2.7.Final.jar lib/io.apicurio.apicurio-common-app-compo
+ nents-logging-0.2.7.Final.jar lib/commons-beanutils.commons-beanutils-1
+ .9.4.jar lib/commons-logging.commons-logging-1.2.jar lib/commons-collec
+ tions.commons-collections-3.2.2.jar lib/io.apicurio.apicurio-common-app
+ -components-config-0.2.7.Final.jar lib/io.apicurio.apicurio-common-app-
+ components-config-definitions-0.2.7.Final.jar lib/io.apicurio.apicurio-
+ common-app-components-config-impl-0.2.7.Final.jar lib/io.apicurio.apicu
+ rio-common-app-components-storage-spi-0.2.7.Final.jar lib/io.apicurio.a
+ picurio-common-app-components-content-0.2.7.Final.jar lib/io.apicurio.a
+ picurio-common-app-components-config-index-0.2.7.Final.jar lib/io.quark
+ us.quarkus-arc-3.15.3.jar lib/io.quarkus.arc.arc-3.15.3.jar lib/io.quar
+ kus.quarkus-core-3.15.3.jar lib/jakarta.inject.jakarta.inject-api-2.0.1
+ .jar lib/io.smallrye.common.smallrye-common-os-2.6.0.jar lib/io.quarkus
+ .quarkus-development-mode-spi-3.15.3.jar lib/io.smallrye.config.smallry
+ e-config-3.9.1.jar lib/io.smallrye.config.smallrye-config-core-3.9.1.ja
+ r lib/io.smallrye.common.smallrye-common-classloader-2.6.0.jar lib/io.s
+ mallrye.config.smallrye-config-common-3.9.1.jar lib/org.jboss.logmanage
+ r.jboss-logmanager-3.1.1.Final.jar lib/io.smallrye.common.smallrye-comm
+ on-cpu-2.6.0.jar lib/io.smallrye.common.smallrye-common-expression-2.6.
+ 0.jar lib/io.smallrye.common.smallrye-common-function-2.6.0.jar lib/io.
+ smallrye.common.smallrye-common-net-2.6.0.jar lib/io.smallrye.common.sm
+ allrye-common-ref-2.6.0.jar lib/org.jboss.logging.jboss-logging-annotat
+ ions-3.0.1.Final.jar lib/org.jboss.threads.jboss-threads-3.6.1.Final.ja
+ r lib/org.wildfly.common.wildfly-common-1.7.0.Final.jar lib/io.quarkus.
+ quarkus-bootstrap-runner-3.15.3.jar lib/io.quarkus.quarkus-classloader-
+ commons-3.15.3.jar lib/io.smallrye.common.smallrye-common-io-2.6.0.jar 
+ lib/io.quarkus.quarkus-fs-util-0.0.10.jar lib/io.apicurio.apicurio-comm
+ on-app-components-auth-0.2.7.Final.jar lib/io.apicurio.apicurio-common-
+ app-components-util-0.2.7.Final.jar lib/io.apicurio.apicurio-common-app
+ -components-multitenancy-0.2.7.Final.jar lib/io.apicurio.apicurio-commo
+ n-app-components-multitenancy-spi-0.2.7.Final.jar lib/io.apicurio.apicu
+ rio-tenant-manager-client-0.2.0.Final.jar lib/io.apicurio.apicurio-tena
+ nt-manager-datamodel-0.2.0.Final.jar lib/jakarta.validation.jakarta.val
+ idation-api-3.0.2.jar lib/com.fasterxml.jackson.core.jackson-databind-2
+ .17.2.jar lib/io.apicurio.apicurio-common-rest-client-jdk-0.1.18.Final.
+ jar lib/io.apicurio.apicurio-common-rest-client-vertx-0.1.18.Final.jar 
+ lib/io.apicurio.apicurio-common-rest-client-common-0.1.18.Final.jar lib
+ /io.vertx.vertx-web-client-4.5.11.jar lib/io.vertx.vertx-uri-template-4
+ .5.11.jar lib/io.vertx.vertx-web-common-4.5.11.jar lib/io.vertx.vertx-a
+ uth-common-4.5.11.jar lib/modified-io.vertx.vertx-core-4.5.11.jar lib/i
+ o.netty.netty-common-4.1.115.Final.jar lib/io.netty.netty-handler-proxy
+ -4.1.115.Final.jar lib/io.netty.netty-codec-socks-4.1.115.Final.jar lib
+ /io.netty.netty-resolver-4.1.115.Final.jar lib/io.netty.netty-resolver-
+ dns-4.1.115.Final.jar lib/io.netty.netty-codec-dns-4.1.115.Final.jar li
+ b/io.apicurio.apicurio-registry-utils-import-export-2.6.11.Final.jar li
+ b/io.apicurio.apicurio-registry-protobuf-schema-utilities-2.6.11.Final.
+ jar lib/com.google.protobuf.protobuf-java-3.25.5.jar lib/com.google.api
+ .grpc.proto-google-common-protos-2.49.0.jar lib/com.squareup.wire.wire-
+ schema-4.9.11.jar lib/com.squareup.wire.wire-runtime-4.9.11.jar lib/com
+ .squareup.okio.okio-3.9.1.jar lib/org.jetbrains.kotlin.kotlin-stdlib-co
+ mmon-1.9.25.jar lib/com.squareup.wire.wire-schema-jvm-4.9.11.jar lib/co
+ m.squareup.javapoet-1.13.0.jar lib/com.squareup.kotlinpoet-jvm-1.16.0.j
+ ar lib/org.jetbrains.kotlin.kotlin-reflect-2.0.10.jar lib/org.jetbrains
+ .kotlin.kotlin-stdlib-jdk8-1.9.25.jar lib/org.jetbrains.kotlin.kotlin-s
+ tdlib-jdk7-1.9.25.jar lib/com.squareup.wire.wire-runtime-jvm-4.9.11.jar
+  lib/com.ibm.icu.icu4j-76.1.jar lib/com.squareup.okio.okio-jvm-3.9.1.ja
+ r lib/org.jetbrains.kotlin.kotlin-stdlib-1.9.25.jar lib/org.jetbrains.a
+ nnotations-24.1.0.jar lib/com.squareup.okio.okio-fakefilesystem-3.9.1.j
+ ar lib/com.squareup.okio.okio-fakefilesystem-jvm-3.9.1.jar lib/org.jetb
+ rains.kotlinx.kotlinx-datetime-jvm-0.6.1.jar lib/com.google.protobuf.pr
+ otobuf-java-util-3.25.5.jar lib/com.google.code.gson.gson-2.11.0.jar li
+ b/io.quarkus.quarkus-undertow-3.15.3.jar lib/io.quarkus.quarkus-vertx-h
+ ttp-3.15.3.jar lib/io.quarkus.quarkus-security-runtime-spi-3.15.3.jar l
+ ib/io.quarkus.quarkus-tls-registry-3.15.3.jar lib/io.smallrye.reactive.
+ smallrye-mutiny-vertx-web-3.16.0.jar lib/io.smallrye.reactive.smallrye-
+ mutiny-vertx-web-common-3.16.0.jar lib/io.smallrye.reactive.smallrye-mu
+ tiny-vertx-auth-common-3.16.0.jar lib/io.smallrye.reactive.smallrye-mut
+ iny-vertx-bridge-common-3.16.0.jar lib/io.smallrye.reactive.smallrye-mu
+ tiny-vertx-uri-template-3.16.0.jar lib/io.vertx.vertx-web-4.5.11.jar li
+ b/io.vertx.vertx-bridge-common-4.5.11.jar lib/io.github.crac.org-crac-0
+ .1.3.jar lib/io.quarkus.security.quarkus-security-2.1.0.jar lib/io.smal
+ lrye.reactive.mutiny-2.6.2.jar lib/org.jctools.jctools-core-4.0.5.jar l
+ ib/jakarta.enterprise.jakarta.enterprise.cdi-api-4.1.0.jar lib/jakarta.
+ enterprise.jakarta.enterprise.lang-model-4.1.0.jar lib/jakarta.el.jakar
+ ta.el-api-5.0.1.jar lib/io.quarkus.http.quarkus-http-servlet-5.3.4.jar 
+ lib/jakarta.servlet.jakarta.servlet-api-6.0.0.jar lib/jakarta.annotatio
+ n.jakarta.annotation-api-3.0.0.jar lib/io.quarkus.http.quarkus-http-ver
+ tx-backend-5.3.4.jar lib/io.quarkus.http.quarkus-http-http-core-5.3.4.j
+ ar lib/io.quarkus.http.quarkus-http-core-5.3.4.jar lib/io.netty.netty-c
+ odec-http-4.1.115.Final.jar lib/org.eclipse.microprofile.context-propag
+ ation.microprofile-context-propagation-api-1.3.jar lib/io.quarkus.quark
+ us-jackson-3.15.3.jar lib/com.fasterxml.jackson.datatype.jackson-dataty
+ pe-jsr310-2.17.2.jar lib/com.fasterxml.jackson.datatype.jackson-datatyp
+ e-jdk8-2.17.2.jar lib/com.fasterxml.jackson.module.jackson-module-param
+ eter-names-2.17.2.jar lib/io.quarkus.quarkus-resteasy-jackson-3.15.3.ja
+ r lib/modified-io.quarkus.quarkus-resteasy-3.15.3.jar lib/io.quarkus.ve
+ rtx.utils.quarkus-vertx-utils-3.15.3.jar lib/io.quarkus.quarkus-resteas
+ y-server-common-3.15.3.jar lib/org.jboss.resteasy.resteasy-cdi-6.2.9.Fi
+ nal.jar lib/org.jboss.resteasy.resteasy-jackson2-provider-6.2.9.Final.j
+ ar lib/com.fasterxml.jackson.jakarta.rs.jackson-jakarta-rs-base-2.17.2.
+ jar lib/com.fasterxml.jackson.jakarta.rs.jackson-jakarta-rs-json-provid
+ er-2.17.2.jar lib/com.fasterxml.jackson.module.jackson-module-jakarta-x
+ mlbind-annotations-2.17.2.jar lib/com.github.java-json-tools.json-patch
+ -1.13.jar lib/com.github.java-json-tools.msg-simple-1.2.jar lib/com.git
+ hub.java-json-tools.btf-1.3.jar lib/com.github.java-json-tools.jackson-
+ coreutils-2.0.jar lib/jakarta.xml.bind.jakarta.xml.bind-api-4.0.2.jar l
+ ib/jakarta.activation.jakarta.activation-api-2.1.3.jar lib/io.quarkus.q
+ uarkus-smallrye-health-3.15.3.jar lib/io.smallrye.smallrye-health-4.1.0
+ .jar lib/org.eclipse.microprofile.health.microprofile-health-api-4.0.1.
+ jar lib/io.smallrye.smallrye-health-api-4.1.0.jar lib/jakarta.json.jaka
+ rta.json-api-2.1.3.jar lib/io.smallrye.smallrye-health-provided-checks-
+ 4.1.0.jar lib/io.quarkus.quarkus-jsonp-3.15.3.jar lib/org.eclipse.parss
+ on.parsson-1.1.7.jar lib/io.quarkus.quarkus-micrometer-registry-prometh
+ eus-3.15.3.jar lib/io.quarkus.quarkus-micrometer-3.15.3.jar lib/io.micr
+ ometer.micrometer-core-1.13.5.jar lib/io.micrometer.micrometer-commons-
+ 1.13.5.jar lib/io.micrometer.micrometer-observation-1.13.5.jar lib/org.
+ hdrhistogram.HdrHistogram-2.2.2.jar lib/org.latencyutils.LatencyUtils-2
+ .0.3.jar lib/io.micrometer.micrometer-registry-prometheus-simpleclient-
+ 1.13.5.jar lib/io.prometheus.simpleclient_common-0.16.0.jar lib/io.prom
+ etheus.simpleclient-0.16.0.jar lib/io.prometheus.simpleclient_tracer_ot
+ el-0.16.0.jar lib/io.prometheus.simpleclient_tracer_common-0.16.0.jar l
+ ib/io.prometheus.simpleclient_tracer_otel_agent-0.16.0.jar lib/io.quark
+ us.quarkus-vertx-3.15.3.jar lib/io.quarkus.quarkus-netty-3.15.3.jar lib
+ /io.netty.netty-codec-4.1.115.Final.jar lib/io.netty.netty-codec-http2-
+ 4.1.115.Final.jar lib/io.netty.netty-handler-4.1.115.Final.jar lib/io.n
+ etty.netty-transport-native-unix-common-4.1.115.Final.jar lib/com.aayus
+ hatharva.brotli4j.brotli4j-1.16.0.jar lib/com.aayushatharva.brotli4j.se
+ rvice-1.16.0.jar lib/com.aayushatharva.brotli4j.native-linux-x86_64-1.1
+ 6.0.jar lib/io.netty.netty-codec-haproxy-4.1.115.Final.jar lib/io.netty
+ .netty-buffer-4.1.115.Final.jar lib/io.netty.netty-transport-4.1.115.Fi
+ nal.jar lib/io.smallrye.common.smallrye-common-annotation-2.6.0.jar lib
+ /io.smallrye.common.smallrye-common-vertx-context-2.6.0.jar lib/io.smal
+ lrye.common.smallrye-common-constraint-2.6.0.jar lib/io.quarkus.quarkus
+ -mutiny-3.15.3.jar lib/io.smallrye.reactive.mutiny-smallrye-context-pro
+ pagation-2.6.2.jar lib/io.quarkus.quarkus-virtual-threads-3.15.3.jar li
+ b/io.quarkus.quarkus-vertx-latebound-mdc-provider-3.15.3.jar lib/io.sma
+ llrye.reactive.smallrye-mutiny-vertx-core-3.16.0.jar lib/io.smallrye.re
+ active.smallrye-mutiny-vertx-runtime-3.16.0.jar lib/io.smallrye.reactiv
+ e.vertx-mutiny-generator-3.16.0.jar lib/io.vertx.vertx-codegen-4.5.11.j
+ ar lib/io.smallrye.smallrye-fault-tolerance-vertx-6.4.0.jar lib/modifie
+ d-io.quarkus.quarkus-oidc-3.15.3.jar lib/io.quarkus.quarkus-security-3.
+ 15.3.jar lib/io.quarkus.quarkus-oidc-common-3.15.3.jar lib/io.smallrye.
+ reactive.smallrye-mutiny-vertx-web-client-3.16.0.jar lib/modified-io.sm
+ allrye.smallrye-jwt-4.5.3.jar lib/org.eclipse.microprofile.jwt.micropro
+ file-jwt-auth-api-2.1.jar lib/org.bitbucket.b_c.jose4j-0.9.6.jar lib/io
+ .smallrye.smallrye-jwt-common-4.5.3.jar lib/modified-io.quarkus.quarkus
+ -smallrye-jwt-3.15.3.jar lib/io.quarkus.quarkus-smallrye-jwt-build-3.15
+ .3.jar lib/io.smallrye.smallrye-jwt-build-4.5.3.jar lib/io.quarkus.quar
+ kus-scheduler-3.15.3.jar lib/io.quarkus.quarkus-scheduler-kotlin-3.15.3
+ .jar lib/io.quarkus.quarkus-scheduler-common-3.15.3.jar lib/io.quarkus.
+ quarkus-scheduler-api-3.15.3.jar lib/io.quarkus.quarkus-scheduler-spi-3
+ .15.3.jar lib/io.opentelemetry.instrumentation.opentelemetry-instrument
+ ation-api-2.5.0.jar lib/io.opentelemetry.opentelemetry-api-1.39.0.jar l
+ ib/io.opentelemetry.opentelemetry-context-1.39.0.jar lib/io.opentelemet
+ ry.opentelemetry-api-incubator-1.39.0-alpha.jar lib/io.opentelemetry.se
+ mconv.opentelemetry-semconv-1.26.0-alpha.jar lib/com.cronutils.cron-uti
+ ls-9.2.1.jar lib/org.jboss.slf4j.slf4j-jboss-logmanager-2.0.0.Final.jar
+  lib/org.glassfish.expressly.expressly-5.0.0.jar lib/io.quarkus.quarkus
+ -smallrye-context-propagation-3.15.3.jar lib/modified-io.smallrye.small
+ rye-context-propagation-2.1.2.jar lib/io.smallrye.smallrye-context-prop
+ agation-api-2.1.2.jar lib/io.smallrye.smallrye-context-propagation-stor
+ age-2.1.2.jar lib/io.quarkus.quarkus-resteasy-client-3.15.3.jar lib/mod
+ ified-io.quarkus.quarkus-resteasy-common-3.15.3.jar lib/modified-org.jb
+ oss.resteasy.resteasy-core-6.2.9.Final.jar lib/org.jboss.resteasy.reste
+ asy-core-spi-6.2.9.Final.jar lib/com.ibm.async.asyncutil-0.1.0.jar lib/
+ org.eclipse.angus.angus-activation-2.0.2.jar lib/org.jboss.resteasy.mic
+ roprofile.microprofile-config-2.1.5.Final.jar lib/io.quarkus.quarkus-ap
+ ache-httpclient-3.15.3.jar lib/org.apache.httpcomponents.httpclient-4.5
+ .14.jar lib/io.quarkus.quarkus-rest-client-config-3.15.3.jar lib/org.ec
+ lipse.microprofile.rest.client.microprofile-rest-client-api-3.0.1.jar l
+ ib/io.smallrye.jandex-3.2.3.jar lib/org.jboss.resteasy.microprofile.mic
+ roprofile-rest-client-2.1.5.Final.jar lib/org.jboss.resteasy.microprofi
+ le.microprofile-rest-client-base-2.1.5.Final.jar lib/org.jboss.resteasy
+ .resteasy-client-6.2.9.Final.jar lib/org.jboss.resteasy.resteasy-client
+ -api-6.2.9.Final.jar lib/jakarta.interceptor.jakarta.interceptor-api-2.
+ 2.0.jar lib/org.apache.httpcomponents.httpasyncclient-4.1.5.jar lib/org
+ .apache.httpcomponents.httpcore-4.4.16.jar lib/org.apache.httpcomponent
+ s.httpcore-nio-4.4.16.jar lib/org.jboss.logging.commons-logging-jboss-l
+ ogging-1.0.0.Final.jar lib/io.quarkus.quarkus-resteasy-client-jackson-3
+ .15.3.jar lib/io.quarkus.quarkus-smallrye-fault-tolerance-3.15.3.jar li
+ b/io.smallrye.smallrye-fault-tolerance-6.4.0.jar lib/org.eclipse.microp
+ rofile.fault-tolerance.microprofile-fault-tolerance-api-4.0.2.jar lib/i
+ o.smallrye.smallrye-fault-tolerance-api-6.4.0.jar lib/io.smallrye.small
+ rye-fault-tolerance-core-6.4.0.jar lib/io.smallrye.smallrye-fault-toler
+ ance-autoconfig-core-6.4.0.jar lib/io.smallrye.smallrye-fault-tolerance
+ -context-propagation-6.4.0.jar lib/io.smallrye.smallrye-fault-tolerance
+ -mutiny-6.4.0.jar lib/io.quarkus.quarkus-jdbc-h2-3.15.3.jar lib/modifie
+ d-com.h2database.h2-2.3.230.jar lib/org.locationtech.jts.jts-core-1.20.
+ 0.jar lib/io.quarkus.quarkus-agroal-3.15.3.jar lib/io.quarkus.quarkus-d
+ atasource-3.15.3.jar lib/io.quarkus.quarkus-datasource-common-3.15.3.ja
+ r lib/io.quarkus.quarkus-narayana-jta-3.15.3.jar lib/io.quarkus.quarkus
+ -transaction-annotations-3.15.3.jar lib/io.smallrye.smallrye-context-pr
+ opagation-jta-2.1.2.jar lib/jakarta.transaction.jakarta.transaction-api
+ -2.0.1.jar lib/io.smallrye.reactive.smallrye-reactive-converter-api-3.0
+ .1.jar lib/io.smallrye.reactive.smallrye-reactive-converter-mutiny-3.0.
+ 1.jar lib/io.smallrye.reactive.mutiny-zero-flow-adapters-1.1.0.jar lib/
+ org.jboss.narayana.jta.narayana-jta-7.0.2.Final.jar lib/jakarta.resourc
+ e.jakarta.resource-api-2.1.0.jar lib/org.jboss.invocation.jboss-invocat
+ ion-2.0.0.Final.jar lib/org.eclipse.microprofile.reactive-streams-opera
+ tors.microprofile-reactive-streams-operators-api-3.0.1.jar lib/org.jbos
+ s.narayana.jts.narayana-jts-integration-7.0.2.Final.jar lib/io.agroal.a
+ groal-api-2.5.jar lib/io.agroal.agroal-narayana-2.5.jar lib/org.jboss.j
+ boss-transaction-spi-8.0.0.Final.jar lib/io.agroal.agroal-pool-2.5.jar 
+ lib/io.quarkus.quarkus-credentials-3.15.3.jar lib/io.sentry.sentry-1.7.
+ 30.jar lib/com.fasterxml.jackson.core.jackson-core-2.17.2.jar lib/commo
+ ns-codec.commons-codec-1.17.1.jar lib/org.apache.commons.commons-lang3-
+ 3.14.0.jar lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml
+ -2.17.2.jar lib/org.yaml.snakeyaml-2.2.jar lib/com.google.guava.guava-3
+ 3.3.1-jre.jar lib/com.google.guava.failureaccess-1.0.1.jar lib/com.goog
+ le.guava.listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
+  lib/com.google.code.findbugs.jsr305-3.0.2.jar lib/org.checkerframework
+ .checker-qual-3.46.0.jar lib/com.google.errorprone.error_prone_annotati
+ ons-2.30.0.jar lib/com.google.j2objc.j2objc-annotations-2.8.jar lib/io.
+ apicurio.apicurio-registry-ui-2.6.11.Final.jar
+Main-Class: io.quarkus.runner.GeneratedMain
+Implementation-Title: apicurio-registry-app
+Implementation-Version: 2.6.11.Final
+

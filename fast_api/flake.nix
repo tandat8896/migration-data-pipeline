@@ -24,6 +24,7 @@
 
         ps.python-dotenv
         ps.faker
+        ps.pymongo  # For MongoDB CDC data generation
       ]);
     in
     {

@@ -12,7 +12,7 @@ import random
 import signal
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from pymongo import MongoClient
@@ -61,7 +61,7 @@ def insert_customer_event(collection):
         "event_id": fake.uuid4(),
         "customer_id": random.randint(1, 430),  # Match Postgres customer IDs
         "event_type": random.choice(["page_view", "add_to_cart", "purchase", "remove_from_cart"]),
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "metadata": {
             "page": fake.uri_path(),
             "device": random.choice(["desktop", "mobile", "tablet"]),
@@ -83,7 +83,7 @@ def insert_inventory_snapshot(collection):
         "quantity": random.randint(0, 500),
         "reorder_point": random.randint(10, 50),
         "unit_cost": round(random.uniform(5.0, 100.0), 2),
-        "last_updated": datetime.utcnow(),
+        "last_updated": datetime.now(timezone.utc),
         "status": "active"
     }
 
@@ -100,7 +100,7 @@ def update_customer_event(collection) -> bool:
 
     update = {
         "$set": {
-            "metadata.updated_at": datetime.utcnow(),
+            "metadata.updated_at": datetime.now(timezone.utc),
             "metadata.processed": True
         }
     }
@@ -125,7 +125,7 @@ def update_inventory_quantity(collection) -> bool:
         {"_id": doc_id},
         {
             "$inc": {"quantity": adjustment},
-            "$set": {"last_updated": datetime.utcnow()}
+            "$set": {"last_updated": datetime.now(timezone.utc)}
         }
     )
 
@@ -138,7 +138,7 @@ def update_inventory_quantity(collection) -> bool:
 def delete_customer_event(collection) -> bool:
     """Delete an old processed event."""
     # Delete events older than 5 minutes that are processed
-    old_time = datetime.utcnow() - timedelta(minutes=5)
+    old_time = datetime.now(timezone.utc) - timedelta(minutes=5)
 
     result = collection.delete_one({
         "timestamp": {"$lt": old_time},
@@ -169,7 +169,7 @@ def mark_inventory_inactive(collection) -> bool:
 
     result = collection.update_one(
         {"_id": doc_id},
-        {"$set": {"status": "inactive", "last_updated": datetime.utcnow()}}
+        {"$set": {"status": "inactive", "last_updated": datetime.now(timezone.utc)}}
     )
 
     if result.modified_count > 0:
