@@ -1,8 +1,9 @@
 {
-  description = "Odoo Data Model Research with tbls";
+  description = "Odoo Data Model Lab with tbls - NixOS 25.11";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Sử dụng chính xác branch nixos-25.11
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
   outputs = { self, nixpkgs }:
@@ -12,22 +13,23 @@
     in
     {
       devShells.${system}.default = pkgs.mkShell {
-        # Sử dụng nativeBuildInputs cho các công cụ chạy trên host
+        # Dùng nativeBuildInputs để các binaries được đưa vào PATH
         nativeBuildInputs = with pkgs; [
           python311
           postgresql_15
-          tbls         # Kiểm tra kỹ package này
-          graphviz     # Để render ảnh từ tbls
+          tbls       # Công cụ phân tích database
+          graphviz   # Cần để tbls render sơ đồ ERD
         ];
 
         shellHook = ''
-          echo "--- Odoo Data Model Lab ---"
+          echo "--- ❄️ NixOS 25.11 DevShell Active ---"
           export PGDATA="$PWD/.db"
-          # Tự động check tbls
+          
+          # Kiểm tra nhanh công cụ
           if command -v tbls > /dev/null; then
-            echo "✅ tbls đã sẵn sàng: $(which tbls)"
+            echo "✅ [tbls] $(tbls --version) đã sẵn sàng."
           else
-            echo "❌ Không tìm thấy tbls trong PATH"
+            echo "❌ [tbls] không tìm thấy trong PATH."
           fi
         '';
       };

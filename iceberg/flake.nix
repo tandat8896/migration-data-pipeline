@@ -34,10 +34,13 @@
 
         export SPARK_HOME=${spark}
 
-        export PACKAGES="org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.0,org.apache.hadoop:hadoop-aws:3.3.4,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.postgresql:postgresql:42.7.3"
+        export PACKAGES="org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.0,org.apache.hadoop:hadoop-aws:3.3.4,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.postgresql:postgresql:42.7.3,org.apache.spark:spark-avro_2.12:3.5.1,io.confluent:kafka-avro-serializer:7.5.0,za.co.absa:abris_2.12:6.4.0"
+
+        export REPOSITORIES="https://packages.confluent.io/maven/,https://repo1.maven.org/maven2/"
 
         exec $SPARK_HOME/bin/spark-shell \
           --packages "$PACKAGES" \
+          --repositories "$REPOSITORIES" \
           --conf spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions \
           --conf spark.sql.catalog.local=org.apache.iceberg.spark.SparkCatalog \
           --conf spark.sql.catalog.local.type=hadoop \

@@ -1,0 +1,41 @@
+erDiagram
+
+"public.orders" }o--o| "public.customers" : "FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE"
+"public.order_items" }o--o| "public.orders" : "FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE"
+
+"public.users" {
+  integer id
+  varchar_50_ username
+  varchar_100_ email
+  timestamp_without_time_zone created_at
+}
+"public.items" {
+  varchar id
+  varchar name
+  varchar description
+}
+"public.customers" {
+  integer customer_id
+  varchar_100_ email
+  varchar_200_ full_name
+  varchar_20_ phone
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.orders" {
+  integer order_id
+  integer customer_id FK
+  numeric_10_2_ total_amount
+  varchar_20_ status
+  varchar_50_ payment_method
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.order_items" {
+  integer item_id
+  integer order_id FK
+  varchar_200_ product_name
+  integer quantity
+  numeric_10_2_ price
+  timestamp_without_time_zone created_at
+}

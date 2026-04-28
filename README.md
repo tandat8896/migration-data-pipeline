@@ -2,81 +2,202 @@
 
 **Lab học zero-downtime migration** với **Schema Governance** sử dụng CDC (Change Data Capture) + Avro + Confluent Schema Registry.
 
-**Status:** Phase 1 Complete ✅ | Phase 2 In Progress (15%)
-**Last updated:** 2026-04-28 Session 5
-**Next session:** Spark Avro Consumers
+**Status:** Phase 1 Complete ✅ | Phase 2 In Progress (60% - Major Breakthrough!) 🎉
+**Last updated:** 2026-04-28 Session 4
+**Next session:** ~June 2026 (Postgres → Supabase pipeline)
+**Latest Achievement:** ✅ Debezium + Confluent Schema Registry WORKING with RECORD schemas!
 
 ---
 
-## 🏗️ Architecture - Production Grade with Schema Governance
+## 🏗️ Architecture - Data Flow với Schema Governance
+
+### 📊 Luồng dữ liệu End-to-End (Postgres pipeline ✅)
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                  CDC SOURCES (2)                      │
-└──────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 1: SOURCE DATABASE - Postgres Local                        │
+│─────────────────────────────────────────────────────────────────│
+│  Database: fastapi_db (127.0.0.1:5432)                          │
+│  Plugin: pgoutput (native logical replication)                  │
+│  Publication: migration_pub                                      │
+│                                                                  │
+│  Data:                                                           │
+│  ├─ customers     → 430 rows   ✅                               │
+│  ├─ orders        → 1,288 rows ⏳                               │
+│  └─ order_items   → 2,576 rows ⏳                               │
+│                                                                  │
+│  Total: 4,294 rows                                               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ WAL (Write-Ahead Log)
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 2: CDC ENGINE - Debezium Server 2.5.4                      │
+│─────────────────────────────────────────────────────────────────│
+│  Connector: pg-local-confluent-avro.properties                  │
+│  Snapshot mode: initial                                          │
+│                                                                  │
+│  ⚙️  Configuration (THE KEY FIX!):                              │
+│  ├─ Format Converter: Avro                                      │
+│  │  └─ debezium.format.value=avro                               │
+│  │  └─ Registers RECORD schema to Confluent Registry            │
+│  │                                                               │
+│  └─ Kafka Serializer: ByteArraySerializer                       │
+│     └─ debezium.sink.kafka.producer.value.serializer=           │
+│        org.apache.kafka.common.serialization.ByteArraySerializer│
+│     └─ Just passes bytes through (NO double serialization!)     │
+│                                                                  │
+│  Output: 430 CDC events (operation='r' for snapshot)            │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Avro binary + schema ID
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 3: SCHEMA REGISTRY - Confluent 7.5.0 (localhost:8081)     │
+│─────────────────────────────────────────────────────────────────│
+│  Registered Schemas (RECORD type! 🎉):                          │
+│  ├─ pg_local_avro_v4.public.customers-key                       │
+│  ├─ pg_local_avro_v4.public.customers-value ✅                  │
+│  ├─ pg_local_avro_v4.public.orders-key                          │
+│  ├─ pg_local_avro_v4.public.orders-value                        │
+│  ├─ pg_local_avro_v4.public.order_items-key                     │
+│  └─ pg_local_avro_v4.public.order_items-value                   │
+│                                                                  │
+│  Schema Structure (customers-value):                            │
+│  {                                                               │
+│    "type": "record",                                             │
+│    "name": "Envelope",                                           │
+│    "fields": [                                                   │
+│      {"name": "before", "type": ["null", "Value"]},             │
+│      {"name": "after", "type": ["null", "Value"]},  ← Full row  │
+│      {"name": "op", "type": "string"},              ← r/u/d/c   │
+│      {"name": "ts_ms", "type": "long"}              ← Timestamp │
+│    ]                                                             │
+│  }                                                               │
+│                                                                  │
+│  Compatibility: BACKWARD                                         │
+│  Versioning: Enabled                                             │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Schema validated
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 4: MESSAGE BROKER - Kafka 3.6.1                            │
+│─────────────────────────────────────────────────────────────────│
+│  Brokers: localhost:9092, localhost:9094                        │
+│                                                                  │
+│  Topics (Postgres v4):                                           │
+│  ├─ pg_local_avro_v4.public.customers   → 430 messages ✅       │
+│  ├─ pg_local_avro_v4.public.orders      → 0 messages   ⏳       │
+│  └─ pg_local_avro_v4.public.order_items → 0 messages   ⏳       │
+│                                                                  │
+│  Message Format (Confluent wire format):                        │
+│  [Magic Byte][Schema ID (4 bytes)][Avro Binary Data]            │
+│   0x00        0x00 0x00 0x00 0x16   {customer_id: 1, ...}       │
+│                                                                  │
+│  Retention: 48 hours                                             │
+│  Compression: lz4                                                │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Streaming read
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 5: PROCESSING - Spark 3.5.1 + Iceberg 1.5.0                │
+│─────────────────────────────────────────────────────────────────│
+│  Script: 10_v4_confluent_avro_to_iceberg.scala                  │
+│                                                                  │
+│  Processing Steps:                                               │
+│  1. Read from Kafka ✅                                           │
+│  2. Parse Confluent wire format (extract schema ID) ✅           │
+│  3. Fetch schema from Registry using ID ✅                       │
+│  4. Deserialize Avro → DataFrame ✅                              │
+│  5. Flatten CDC envelope (before/after/op/ts_ms) ✅              │
+│  6. Write to Iceberg Bronze ✅                                   │
+│                                                                  │
+│  Records processed: 430 customers                                │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Batch write
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 6: DATA LAKE - Iceberg Bronze (Audit Trail)                │
+│─────────────────────────────────────────────────────────────────│
+│  Catalog: local (Spark catalog)                                 │
+│  Database: migration                                             │
+│  Table: cdc_bronze_v4                                            │
+│                                                                  │
+│  Schema:                                                         │
+│  ├─ topic: string                                                │
+│  ├─ kafka_timestamp: timestamp                                   │
+│  ├─ operation: string (r/u/d/c)                                  │
+│  ├─ before: struct (old values or null)                          │
+│  ├─ after: struct (new values)                                   │
+│  │  ├─ customer_id: int                                          │
+│  │  ├─ full_name: string                                         │
+│  │  ├─ email: string                                             │
+│  │  ├─ phone: string                                             │
+│  │  ├─ created_at: long                                          │
+│  │  └─ updated_at: long                                          │
+│  └─ cdc_timestamp_ms: long                                       │
+│                                                                  │
+│  Partitioning: days(kafka_timestamp)                             │
+│  Format: Parquet                                                 │
+│  Records: 430 ✅                                                 │
+│  Location: iceberg/warehouse/migration/cdc_bronze_v4/            │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Transform
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 7: DATA WAREHOUSE - Iceberg Silver (SCD Type 2)            │
+│─────────────────────────────────────────────────────────────────│
+│  Script: 12_scd_type2.scala                                     │
+│  Table: customers_scd2                                           │
+│                                                                  │
+│  Schema (Slowly Changing Dimension Type 2):                     │
+│  ├─ customer_id: int        ← Business key                      │
+│  ├─ full_name: string                                            │
+│  ├─ email: string                                                │
+│  ├─ phone: string                                                │
+│  ├─ created_at: long                                             │
+│  ├─ updated_at: long                                             │
+│  ├─ is_current: boolean     ← TRUE = latest version             │
+│  ├─ valid_from: timestamp   ← When this version started         │
+│  ├─ valid_to: timestamp     ← When this version ended (NULL=now)│
+│  └─ version: int            ← Version number (1, 2, 3...)       │
+│                                                                  │
+│  Partitioning: is_current (fast current lookups)                │
+│  Records: 430 ✅ (all version 1, is_current=true)               │
+│                                                                  │
+│  Example query (get current snapshot):                          │
+│  SELECT * FROM customers_scd2 WHERE is_current = true           │
+│                                                                  │
+│  Example query (time-travel):                                   │
+│  SELECT * FROM customers_scd2                                    │
+│  WHERE customer_id = 1 ORDER BY version DESC                    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Upsert (TODO)
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 8: TARGET DATABASE - Supabase Postgres (Cloud)             │
+│─────────────────────────────────────────────────────────────────│
+│  Connection: Transaction Pooler (port 5432)                     │
+│  Database: postgres                                              │
+│  User: debezium_cdc                                              │
+│                                                                  │
+│  Target Tables:                                                  │
+│  ├─ target_customers      → 0 rows ⏳ (ready for upsert)        │
+│  ├─ target_orders         → 0 rows ⏳                            │
+│  ├─ target_order_items    → 0 rows ⏳                            │
+│  └─ migration_status      → Tracking table                      │
+│                                                                  │
+│  SSL: TLSv1.3 (enforced)                                         │
+│  Permissions: INSERT, UPDATE, DELETE granted ✅                  │
+│                                                                  │
+│  Next Step: Iceberg Silver → Supabase upsert job                │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-┌─────────────────┐              ┌──────────────────┐
-│ Postgres Local  │              │ MongoDB Atlas    │
-│ 127.0.0.1:5432  │              │ Cloud (M10+)     │
-│                 │              │                  │
-│ • customers     │              │ • customer_evt   │
-│ • orders        │              │ • inventory_*    │
-│ • order_items   │              │                  │
-│                 │              │ Oplog enabled    │
-│ Plugin:pgoutput │              │ Replica set ✅   │
-└────────┬────────┘              └────────┬─────────┘
-         │                                │
-         └────────────┬───────────────────┘
-                      ▼
-         ┌────────────────────────────┐
-         │   DEBEZIUM SERVER 2.5.4    │
-         │   (Standalone CDC Engine)  │
-         │                            │
-         │ ✅ pg-local-migration      │
-         │ ✅ mongo-migration         │
-         │                            │
-         │ Format: Avro (binary)      │
-         │ Serializer: Confluent 7.5  │
-         └────────────┬───────────────┘
-                      ▼
-         ┌────────────────────────────┐
-         │ CONFLUENT SCHEMA REGISTRY  │
-         │      http://localhost:8081 │
-         │                            │
-         │ ✅ 6 Postgres schemas      │
-         │ ✅ 4 MongoDB schemas       │
-         │                            │
-         │ Mode: BACKWARD compat      │
-         │ Versioning: Enabled        │
-         └────────────┬───────────────┘
-                      ▼
-         ┌────────────────────────────┐
-         │    KAFKA BROKERS (2)       │
-         │ localhost:9092, :9094      │
-         │                            │
-         │ Topics (Postgres):         │
-         │ • pg_local_avro_v2         │
-         │   .public.customers ✅     │
-         │   .public.orders ✅        │
-         │   .public.order_items ✅   │
-         │                            │
-         │ Topics (MongoDB):          │
-         │ • mongo_atlas_v2           │
-         │   .zdm_test                │
-         │   .customer_events ✅      │
-         │   .inventory_* ✅          │
-         │                            │
-         │ Format: Avro + schema ID   │
-         └────────────┬───────────────┘
-                      ▼
-         ┌────────────────────────────┐
-         │   SPARK 3.5.1 + Iceberg    │
-         │   Streaming Jobs (TODO)    │
-         │                            │
-         │ ⏳ Job 1: PG Avro Consumer │
-         │ ⏳ Job 2: Mongo Consumer   │
-         │ ⏳ Job 3: Lag Monitor      │
-         └────────────┬───────────────┘
+### 🔑 Key Innovation: ByteArraySerializer Solution
+
+**Problem:** Debezium + Confluent Schema Registry registered "string" or "bytes" schemas
+
+**Root Cause:** Double serialization
+- ❌ Avro Format Converter → Avro bytes
+- ❌ KafkaAvroSerializer → Wraps bytes as "bytes" schema
+
+**Solution:**
+- ✅ Avro Format Converter (registers RECORD schema)
+- ✅ ByteArraySerializer (just passes bytes through)
+
+**Result:** Perfect RECORD schemas with full CDC envelope! 🎉
                       ▼
     ┌─────────────────┴──────────────┐
     ▼                                ▼
@@ -560,11 +681,20 @@ Overall Progress: ████████████████░░░░ 9
 
 ## 📞 Owner Notes
 
-**Infra:** Owner tự setup (Postgres, MongoDB, Kafka, Supabase)
-**Current:** Postgres pipeline working, MongoDB pending
-**Next:** Generate MongoDB data → Complete Phase 2
+**Infra:** Owner tự setup (Postgres, MongoDB, Kafka, Supabase, Confluent Schema Registry)
+**Current:**
+- ✅ Postgres → Debezium → Kafka → Confluent → Spark → Iceberg (WORKING!)
+- ✅ Schema Registry: RECORD schemas (not "string" or "bytes")
+- ⏳ MongoDB pipeline (ready, needs full run)
+- ⏳ Iceberg → Supabase upsert (TODO next session)
+
+**Next Session (~June 2026):**
+1. Complete Postgres → Supabase pipeline
+2. MongoDB CDC → Iceberg + Supabase
+3. Lag monitoring + validation jobs
 
 ---
 
-**Lab status:** Production-ready for Postgres sources! 🎉
-**Last migration:** 2026-04-26 10:28:50 (430 customers)
+**Lab status:** Schema Governance ACHIEVED! 🎉
+**Last migration:** 2026-04-28 19:38:58 (430 customers to Iceberg v4)
+**Schema Type:** ✅ RECORD (full CDC envelope with before/after/op/ts_ms)

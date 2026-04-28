@@ -1,0 +1,466 @@
+{
+  "name": "fastapi_db",
+  "tables": [
+    {
+      "name": "public.users",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": false,
+          "default": "nextval('users_id_seq'::regclass)"
+        },
+        {
+          "name": "username",
+          "type": "varchar(50)",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "users_pkey",
+          "def": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)",
+          "table": "public.users",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "users_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "public.users",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "public.items",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "varchar",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "varchar",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "items_pkey",
+          "def": "CREATE UNIQUE INDEX items_pkey ON public.items USING btree (id)",
+          "table": "public.items",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "ix_items_description",
+          "def": "CREATE INDEX ix_items_description ON public.items USING btree (description)",
+          "table": "public.items",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "ix_items_name",
+          "def": "CREATE INDEX ix_items_name ON public.items USING btree (name)",
+          "table": "public.items",
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "ix_items_id",
+          "def": "CREATE INDEX ix_items_id ON public.items USING btree (id)",
+          "table": "public.items",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "items_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "public.items",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "public.customers",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "integer",
+          "nullable": false,
+          "default": "nextval('customers_customer_id_seq'::regclass)"
+        },
+        {
+          "name": "email",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "full_name",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "phone",
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "customers_pkey",
+          "def": "CREATE UNIQUE INDEX customers_pkey ON public.customers USING btree (customer_id)",
+          "table": "public.customers",
+          "columns": [
+            "customer_id"
+          ]
+        },
+        {
+          "name": "customers_email_key",
+          "def": "CREATE UNIQUE INDEX customers_email_key ON public.customers USING btree (email)",
+          "table": "public.customers",
+          "columns": [
+            "email"
+          ]
+        },
+        {
+          "name": "idx_customers_email",
+          "def": "CREATE INDEX idx_customers_email ON public.customers USING btree (email)",
+          "table": "public.customers",
+          "columns": [
+            "email"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "customers_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (customer_id)",
+          "table": "public.customers",
+          "referenced_table": "",
+          "columns": [
+            "customer_id"
+          ]
+        },
+        {
+          "name": "customers_email_key",
+          "type": "UNIQUE",
+          "def": "UNIQUE (email)",
+          "table": "public.customers",
+          "referenced_table": "",
+          "columns": [
+            "email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "public.orders",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "integer",
+          "nullable": false,
+          "default": "nextval('orders_order_id_seq'::regclass)"
+        },
+        {
+          "name": "customer_id",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "total_amount",
+          "type": "numeric(10,2)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "'pending'::character varying"
+        },
+        {
+          "name": "payment_method",
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "orders_pkey",
+          "def": "CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (order_id)",
+          "table": "public.orders",
+          "columns": [
+            "order_id"
+          ]
+        },
+        {
+          "name": "idx_orders_customer_id",
+          "def": "CREATE INDEX idx_orders_customer_id ON public.orders USING btree (customer_id)",
+          "table": "public.orders",
+          "columns": [
+            "customer_id"
+          ]
+        },
+        {
+          "name": "idx_orders_status",
+          "def": "CREATE INDEX idx_orders_status ON public.orders USING btree (status)",
+          "table": "public.orders",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_orders_created_at",
+          "def": "CREATE INDEX idx_orders_created_at ON public.orders USING btree (created_at)",
+          "table": "public.orders",
+          "columns": [
+            "created_at"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "valid_status",
+          "type": "CHECK",
+          "def": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'shipped'::character varying, 'delivered'::character varying, 'cancelled'::character varying])::text[])))",
+          "table": "public.orders",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "orders_customer_id_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE",
+          "table": "public.orders",
+          "referenced_table": "customers",
+          "columns": [
+            "customer_id"
+          ],
+          "referenced_columns": [
+            "customer_id"
+          ]
+        },
+        {
+          "name": "orders_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (order_id)",
+          "table": "public.orders",
+          "referenced_table": "",
+          "columns": [
+            "order_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "public.order_items",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "item_id",
+          "type": "integer",
+          "nullable": false,
+          "default": "nextval('order_items_item_id_seq'::regclass)"
+        },
+        {
+          "name": "order_id",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "product_name",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "price",
+          "type": "numeric(10,2)",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "order_items_pkey",
+          "def": "CREATE UNIQUE INDEX order_items_pkey ON public.order_items USING btree (item_id)",
+          "table": "public.order_items",
+          "columns": [
+            "item_id"
+          ]
+        },
+        {
+          "name": "idx_order_items_order_id",
+          "def": "CREATE INDEX idx_order_items_order_id ON public.order_items USING btree (order_id)",
+          "table": "public.order_items",
+          "columns": [
+            "order_id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "order_items_price_check",
+          "type": "CHECK",
+          "def": "CHECK ((price \u003e= (0)::numeric))",
+          "table": "public.order_items",
+          "referenced_table": "",
+          "columns": [
+            "price"
+          ]
+        },
+        {
+          "name": "order_items_quantity_check",
+          "type": "CHECK",
+          "def": "CHECK ((quantity \u003e 0))",
+          "table": "public.order_items",
+          "referenced_table": "",
+          "columns": [
+            "quantity"
+          ]
+        },
+        {
+          "name": "order_items_order_id_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE",
+          "table": "public.order_items",
+          "referenced_table": "orders",
+          "columns": [
+            "order_id"
+          ],
+          "referenced_columns": [
+            "order_id"
+          ]
+        },
+        {
+          "name": "order_items_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (item_id)",
+          "table": "public.order_items",
+          "referenced_table": "",
+          "columns": [
+            "item_id"
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "table": "public.orders",
+      "columns": [
+        "customer_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "public.customers",
+      "parent_columns": [
+        "customer_id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE"
+    },
+    {
+      "table": "public.order_items",
+      "columns": [
+        "order_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "public.orders",
+      "parent_columns": [
+        "order_id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE"
+    }
+  ],
+  "driver": {
+    "name": "postgres",
+    "database_version": "PostgreSQL 15.17 on x86_64-pc-linux-gnu, compiled by clang version 21.1.7, 64-bit",
+    "meta": {
+      "current_schema": "public",
+      "search_paths": [
+        "fastapi_user",
+        "public"
+      ],
+      "dict": {
+        "Functions": "Stored procedures and functions"
+      }
+    }
+  }
+}
