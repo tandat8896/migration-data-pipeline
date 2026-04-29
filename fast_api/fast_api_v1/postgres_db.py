@@ -1,34 +1,25 @@
-import sqlalchemy
-from sqlalchemy import create_engine
+import os
+
 from dotenv import load_dotenv
-import os 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-env_path = os.path.join(os.path.dirname(__file__), '../.env')
-load_dotenv(env_path)
+load_dotenv()
 
+user = os.getenv("DB_USER")
+password = os.getenv("DB_PASSWORD")
+db_name = os.getenv("DB_NAME")
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
 
-
-user = os.getenv('DB_USER')
-password = os.getenv('DB_PASSWORD')
-db_name = os.getenv('DB_NAME')
-db_host = os.getenv('DB_HOST')
-db_port = os.getenv('DB_PORT')
 DATABASE_URL = (
-    f"postgresql://{user}:{password}@{db_host}:{db_port}/{db_name}"
-    "?sslmode=require"
+    f"postgresql://{user}:{password}@{db_host}:{db_port}/{db_name}?sslmode=require"
 )
-engine = create_engine(DATABASE_URL, echo=True, future= True)
-print(engine)
 
-try:
-    with engine.connect() as connection:
-        print("Connection to the database was successful!")
-except Exception as e:
-    print(f"An error occurred while connecting to the database: {e}")
+engine = create_engine(DATABASE_URL, echo=False)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-
-SessionLocal = sessionmaker(autocommit= False, autoflush= False, bind= engine)
 
 def get_db():
     db = SessionLocal()
@@ -36,5 +27,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-

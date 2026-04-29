@@ -2,10 +2,10 @@
 
 **Lab học zero-downtime migration** với **Schema Governance** sử dụng CDC (Change Data Capture) + Avro + Confluent Schema Registry.
 
-**Status:** Phase 1 Complete ✅ | Phase 2 In Progress (60% - Major Breakthrough!) 🎉
+**Status:** Phase 1 Complete ✅ | Phase 2 In Progress (65% - Real-time CDC Working!) 🎉
 **Last updated:** 2026-04-28 Session 4
 **Next session:** ~June 2026 (Postgres → Supabase pipeline)
-**Latest Achievement:** ✅ Debezium + Confluent Schema Registry WORKING with RECORD schemas!
+**Latest Achievement:** ✅ Full CDC Pipeline WORKING - All operations (INSERT/UPDATE/DELETE) tested!
 
 ---
 
@@ -45,7 +45,11 @@
 │        org.apache.kafka.common.serialization.ByteArraySerializer│
 │     └─ Just passes bytes through (NO double serialization!)     │
 │                                                                  │
-│  Output: 430 CDC events (operation='r' for snapshot)            │
+│  Output: 433 CDC events ✅                                       │
+│  ├─ operation='r' (snapshot): 430                               │
+│  ├─ operation='c' (INSERT): 1                                   │
+│  ├─ operation='u' (UPDATE): 1                                   │
+│  └─ operation='d' (DELETE): 1                                   │
 └─────────────────────────────────────────────────────────────────┘
                               ↓ Avro binary + schema ID
 ┌─────────────────────────────────────────────────────────────────┐
@@ -81,7 +85,8 @@
 │  Brokers: localhost:9092, localhost:9094                        │
 │                                                                  │
 │  Topics (Postgres v4):                                           │
-│  ├─ pg_local_avro_v4.public.customers   → 430 messages ✅       │
+│  ├─ pg_local_avro_v4.public.customers   → 433 messages ✅       │
+│  │  (430 snapshot + 1 INSERT + 1 UPDATE + 1 DELETE)             │
 │  ├─ pg_local_avro_v4.public.orders      → 0 messages   ⏳       │
 │  └─ pg_local_avro_v4.public.order_items → 0 messages   ⏳       │
 │                                                                  │
@@ -106,7 +111,11 @@
 │  5. Flatten CDC envelope (before/after/op/ts_ms) ✅              │
 │  6. Write to Iceberg Bronze ✅                                   │
 │                                                                  │
-│  Records processed: 430 customers                                │
+│  Records processed: 433 CDC events                               │
+│  ├─ Snapshot (r): 430                                            │
+│  ├─ INSERT (c): 1                                                │
+│  ├─ UPDATE (u): 1                                                │
+│  └─ DELETE (d): 1                                                │
 └─────────────────────────────────────────────────────────────────┘
                               ↓ Batch write
 ┌─────────────────────────────────────────────────────────────────┐
@@ -132,7 +141,11 @@
 │                                                                  │
 │  Partitioning: days(kafka_timestamp)                             │
 │  Format: Parquet                                                 │
-│  Records: 430 ✅                                                 │
+│  Records: 433 ✅ (All CDC operations tested!)                    │
+│  ├─ Snapshot: 430                                                │
+│  ├─ INSERT: 1                                                    │
+│  ├─ UPDATE: 1                                                    │
+│  └─ DELETE: 1                                                    │
 │  Location: iceberg/warehouse/migration/cdc_bronze_v4/            │
 └─────────────────────────────────────────────────────────────────┘
                               ↓ Transform
@@ -394,9 +407,9 @@ Ready for Avro serialization ✅
 - log4j doesn't expand shell environment variables
 
 **Output (current):**
-- Kafka: 5,413 total messages (Postgres: 4,294 + MongoDB: 1,119)
-- Iceberg Bronze: 430 CDC records (Postgres only - audit trail)
-- Supabase Target: 430 customers migrated (Postgres pipeline complete)
+- Kafka: 5,416 total messages (Postgres: 4,297 + MongoDB: 1,119)
+- Iceberg Bronze: 433 CDC events ✅ (All operations: r/c/u/d tested!)
+- Supabase Target: 430 customers migrated (Postgres snapshot only)
 - Migration latency: ~2 seconds end-to-end
 - **Next:** MongoDB → Supabase pipeline (Spark Lesson 6)
 
@@ -483,9 +496,9 @@ mongosh "$MONGO_URL" --eval "db.adminCommand('ping')"
 
 | Component | Records | Status |
 |-----------|---------|--------|
-| Postgres Source | 4,294 | ✅ Streaming |
-| Kafka Messages | 4,294 | ✅ Active |
-| Iceberg Bronze | 430 | ✅ Stored |
+| Postgres Source | 4,297 | ✅ Streaming |
+| Kafka Messages | 4,297 | ✅ Active |
+| Iceberg Bronze | 433 | ✅ Stored (All CDC ops!) |
 | Supabase Target | 430 | ✅ Migrated |
 | MongoDB Source | 0 | ⏳ Pending |
 
@@ -638,9 +651,10 @@ export PACKAGES="...,org.postgresql:postgresql:42.7.3"
 
 ## 🔑 Key Achievements
 
-✅ **Full CDC pipeline working** (Postgres → Supabase)
-✅ **430 customers migrated** with audit trail
-✅ **Iceberg Bronze table** (time-travel capable)
+✅ **Full CDC pipeline working** (Postgres → Kafka → Iceberg)
+✅ **Real-time CDC tested** - All operations: INSERT/UPDATE/DELETE ✅
+✅ **433 CDC events captured** (430 snapshot + 3 real-time ops)
+✅ **Iceberg Bronze table** (time-travel capable audit trail)
 ✅ **Production-grade setup** (SSL, permissions, error handling)
 ✅ **Zero downtime** for source databases
 
@@ -695,6 +709,6 @@ Overall Progress: ████████████████░░░░ 9
 
 ---
 
-**Lab status:** Schema Governance ACHIEVED! 🎉
-**Last migration:** 2026-04-28 19:38:58 (430 customers to Iceberg v4)
+**Lab status:** Real-time CDC Pipeline WORKING! 🎉
+**Last test:** 2026-04-28 (433 CDC events - All operations tested: r/c/u/d)
 **Schema Type:** ✅ RECORD (full CDC envelope with before/after/op/ts_ms)
